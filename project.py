@@ -35,9 +35,10 @@ def main():
 			print(res)
 	elif command == 'countCustomizedModel':
 		pass
-		# ids = sys.argv[2:]
-		# response = countCustomizedModel(mycursor, ids)
-		# print(response)
+		ids = sys.argv[2:]
+		response = countCustomizedModel(mycursor, ids)
+		for res in response:
+			print(res)
     
     
 if __name__ == "__main__":

@@ -10,10 +10,24 @@ def listInternetService(cursor, id):
         res = response[i]
         response[i] = f'{res[0]},{res[1]},{res[2]}'
 
-    if len(response) == 0:
-        response = ["Invalid input, values not found."]
-
     return response
 
 def countCustomizedModel(cursor, ids):
-    pass
+    conditional = 'c.bmid = ' + ids[0]
+    for i in range(1, len(ids)):
+        conditional += ' OR c.bmid = ' + ids[i]
+        
+    cursor.execute(f'''SELECT b.bmid, b.description, COUNT(*)
+                   FROM BaseModel AS b
+                   JOIN CustomizedModel AS c ON b.bmid = c.bmid
+                   WHERE {conditional}
+                   GROUP BY b.bmid
+                   ORDER BY b.bmid ASC;''')
+    
+    response = cursor.fetchall()
+    
+    for i in range(len(response)):
+        res = response[i]
+        response[i] = f'{res[0]},{res[1]},{res[2]}'
+
+    return response
