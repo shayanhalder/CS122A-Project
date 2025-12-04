@@ -1,7 +1,7 @@
 import mysql.connector
 import sys
 from dotenv import dotenv_values, load_dotenv
-from table_initialization import create_tables
+from table_initialization import create_tables, load_csv_data
 
 load_dotenv()
 config = dotenv_values(".env")
@@ -19,9 +19,14 @@ def main():
 	print("Connection successful")
 
 	mycursor = mydb.cursor()
-	create_tables(mycursor)	
+	command = sys.argv[1]
  
-	print("Tables created successfully")
+	if command == 'import':
+		create_tables(mycursor, mydb)	
+		print("Tables created successfully")
+		folder_name = sys.argv[2]
+		load_csv_data(mycursor, mydb, folder_name)
+		print("Data loaded successfully")
     
     
 if __name__ == "__main__":
