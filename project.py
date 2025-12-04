@@ -13,7 +13,7 @@ def main():
 		host="localhost",
 		user="root",
 		password=config["PASSWORD"],
-  		database="agent_platform"
+  		database="AgentPlatform"
 	)
  
 	print("Connection successful")
