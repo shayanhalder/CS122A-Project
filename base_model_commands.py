@@ -42,3 +42,13 @@ def addCustomizedModel(cursor, mydb, mid, bmid):
         return "Success"
     except mysql.connector.Error as err:
         return "Fail"
+    
+def deleteBaseModel(cursor, mydb, bmid): 
+    try: 
+        query = f'''DELETE FROM BaseModel
+                    WHERE bmid={bmid}'''
+        cursor.execute(query)
+        mydb.commit()
+        return "Success"
+    except mysql.connector.Error as err:
+        return "Fail"

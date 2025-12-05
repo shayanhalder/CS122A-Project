@@ -2,7 +2,7 @@ import mysql.connector
 import sys
 from dotenv import dotenv_values, load_dotenv
 from table_initialization import create_tables, load_csv_data
-from base_model_commands import listInternetService, countCustomizedModel, addCustomizedModel
+from base_model_commands import listInternetService, countCustomizedModel, addCustomizedModel, deleteBaseModel
 
 load_dotenv()
 config = dotenv_values(".env")
@@ -44,7 +44,11 @@ def main():
 		bmid = sys.argv[3]
 		response = addCustomizedModel(mycursor, mydb, mid, bmid)
 		print(response)
-    
+	elif command == 'deleteBaseModel':
+		bmid = sys.argv[2]
+		response = deleteBaseModel(mycursor, mydb, bmid)
+		print(response)
+	
     
 if __name__ == "__main__":
     main()
