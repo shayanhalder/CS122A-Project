@@ -2,7 +2,7 @@ import mysql.connector
 import sys
 from dotenv import dotenv_values, load_dotenv
 from table_initialization import create_tables, load_csv_data
-from base_model_commands import listInternetService, countCustomizedModel
+from base_model_commands import listInternetService, countCustomizedModel, addCustomizedModel
 
 load_dotenv()
 config = dotenv_values(".env")
@@ -39,6 +39,11 @@ def main():
 		response = countCustomizedModel(mycursor, ids)
 		for res in response:
 			print(res)
+	elif command == 'addCustomizedModel':
+		mid = sys.argv[2]
+		bmid = sys.argv[3]
+		response = addCustomizedModel(mycursor, mydb, mid, bmid)
+		print(response)
     
     
 if __name__ == "__main__":

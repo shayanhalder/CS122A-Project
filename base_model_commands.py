@@ -1,3 +1,4 @@
+import mysql.connector
 def listInternetService(cursor, id):
     cursor.execute(f'''SELECT s.sid, s.endpoints, s.provider
                    FROM InternetService AS s JOIN ModelServices AS ms ON s.sid = ms.sid
@@ -31,3 +32,13 @@ def countCustomizedModel(cursor, ids):
         response[i] = f'{res[0]},{res[1]},{res[2]}'
 
     return response
+
+def addCustomizedModel(cursor, mydb, mid, bmid): 
+    try: 
+        query = f'''INSERT INTO CustomizedModel (bmid, mid)
+                    VALUES ( {mid}, {bmid})'''
+        cursor.execute(query)
+        mydb.commit()
+        return "Success"
+    except mysql.connector.Error as err:
+        return "Fail"
