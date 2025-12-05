@@ -1,14 +1,15 @@
 import mysql.connector
 import sys
 from dotenv import dotenv_values, load_dotenv
-from table_initialization import create_tables, load_csv_data
+from table_initialization import import_dataset
 from base_model_commands import listInternetService, countCustomizedModel, addCustomizedModel, deleteBaseModel
+from agent_client_commands import insertAgentClient
 
 load_dotenv()
 config = dotenv_values(".env")
 
 def main():
-	print("Command-line args: ", sys.argv, '\n')
+	print(sys.argv)
     
 	mydb = mysql.connector.connect(
 		host="localhost",
@@ -23,13 +24,12 @@ def main():
 	command = sys.argv[1]
  
 	if command == 'import':
-		try: 
-			create_tables(mycursor, mydb)	
-			folder_name = sys.argv[2]
-			load_csv_data(mycursor, mydb, folder_name)
-			print("Success")
-		except Exception: 
-			print("Fail")
+		response = import_dataset(sys.argv[2], mycursor, mydb)
+		print(response)
+	elif command == "insertAgentClient":
+		values = sys.argv[2:]
+		response = insertAgentClient(values, mycursor, mydb)
+		print(response)
 	elif command == 'listInternetService':
 		id = sys.argv[2]
 		response = listInternetService(mycursor, id)
