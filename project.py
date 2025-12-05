@@ -23,11 +23,13 @@ def main():
 	command = sys.argv[1]
  
 	if command == 'import':
-		create_tables(mycursor, mydb)	
-		print("Tables created successfully")
-		folder_name = sys.argv[2]
-		load_csv_data(mycursor, mydb, folder_name)
-		print("Data loaded successfully")
+		try: 
+			create_tables(mycursor, mydb)	
+			folder_name = sys.argv[2]
+			load_csv_data(mycursor, mydb, folder_name)
+			print("Success")
+		except Exception: 
+			print("Fail")
 	elif command == 'listInternetService':
 		id = sys.argv[2]
 		response = listInternetService(mycursor, id)
