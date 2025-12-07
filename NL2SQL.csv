@@ -1,0 +1,220 @@
+NLquery_id,NLquery,LLM_model_name,prompt,LLM_returned_SQL_id,LLM_returned_SQL_query,SQL_correct,Error_1_Invalid_Column_Ref,Error_2_Invalid_Table_Ref
+1,"For each Internet Service(sid), find the most frequently used version among all Base Models that utilize it. If multiple versions have the same highest frequency, you may return any one of them.",ChatGPT 5.1,"Translate this natural language query into SQL format: For each Internet Service(sid), find the most frequently used version among all Base Models that utilize it. If multiple versions have the same highest frequency, you may return any one of them.",1,"SELECT
+    bm.sid,
+    bm.version
+FROM (
+    -- Count how many times each (sid, version) pair appears
+    SELECT
+        sid,
+        version,
+        ROW_NUMBER() OVER (
+            PARTITION BY sid
+            ORDER BY COUNT(*) DESC
+        ) AS rn
+    FROM BaseModel
+    GROUP BY sid, version
+) AS bm
+WHERE bm.rn = 1;
+",FALSE,TRUE,FALSE
+1,"For each Internet Service(sid), find the most frequently used version among all Base Models that utilize it. If multiple versions have the same highest frequency, you may return any one of them.",ChatGPT 5.1,"CREATE TABLE ModelServices (
+    bmid INT NOT NULL,
+    sid INT NOT NULL,
+    version INT NOT NULL,
+    PRIMARY KEY (bmid, sid),
+    FOREIGN KEY (bmid) REFERENCES BaseModel(bmid) ON DELETE CASCADE,
+    FOREIGN KEY (sid) REFERENCES InternetService(sid) ON DELETE CASCADE
+);
+
+Translate this natural language query into SQL format: For each Internet Service(sid), find the most frequently used version among all Base Models that utilize it. If multiple versions have the same highest frequency, you may return any one of them.",2,"SELECT ms.sid, ms.version
+FROM ModelServices ms
+JOIN (
+    SELECT sid, version, 
+           ROW_NUMBER() OVER (
+               PARTITION BY sid 
+               ORDER BY COUNT(*) DESC
+           ) AS rn
+    FROM ModelServices
+    GROUP BY sid, version
+) ranked
+ON ms.sid = ranked.sid AND ms.version = ranked.version
+WHERE ranked.rn = 1;
+",FALSE,FALSE,FALSE
+1,"For each Internet Service(sid), find the most frequently used version among all Base Models that utilize it. If multiple versions have the same highest frequency, you may return any one of them.",ChatGPT 5.1,"CREATE TABLE ModelServices (
+    bmid INT NOT NULL,
+    sid INT NOT NULL,
+    version INT NOT NULL,
+    PRIMARY KEY (bmid, sid),
+    FOREIGN KEY (bmid) REFERENCES BaseModel(bmid) ON DELETE CASCADE,
+    FOREIGN KEY (sid) REFERENCES InternetService(sid) ON DELETE CASCADE
+);
+
+Above I have provided the ModelServices Table Schema
+
+Translate this natural language query into MySQL format: For each Internet Service(sid), find the most frequently used version among all Base Models that utilize it. If multiple versions have the same highest frequency, you may return any one of them.",3,"SELECT sid, version
+FROM (
+    SELECT 
+        sid,
+        version,
+        COUNT(*) AS freq,
+        ROW_NUMBER() OVER (PARTITION BY sid ORDER BY COUNT(*) DESC) AS rn
+    FROM ModelServices
+    GROUP BY sid, version
+) AS t
+WHERE rn = 1;
+",TRUE,FALSE,FALSE
+2,Find all the Internet Service(sid) that are utilized by every Base Model built by the agent creator user_iuwrh.,ChatGPT 5.1,Translate this natural language query into SQL format: Find all the Internet Service(sid) that are utilized by every Base Model built by the agent creator user_iuwrh.,1,"SELECT u.sid
+FROM Utilizes u
+JOIN BaseModel b ON u.bid = b.bid
+WHERE b.creator = 'user_iuwrh'
+GROUP BY u.sid
+HAVING COUNT(DISTINCT u.bid) = (
+    SELECT COUNT(DISTINCT bid)
+    FROM BaseModel
+    WHERE creator = 'user_iuwrh'
+);
+",FALSE,FALSE,TRUE
+2,Find all the Internet Service(sid) that are utilized by every Base Model built by the agent creator user_iuwrh.,ChatGPT 5.1,"CREATE TABLE User (
+    uid INT,
+    email TEXT NOT NULL,
+    username TEXT NOT NULL,
+    PRIMARY KEY (uid)
+);
+
+CREATE TABLE AgentCreator (
+    uid INT,
+    bio TEXT,
+    payout TEXT,
+    PRIMARY KEY (uid),
+    FOREIGN KEY (uid) REFERENCES User(uid) ON DELETE CASCADE
+);
+
+CREATE TABLE ModelServices (
+    bmid INT NOT NULL,
+    sid INT NOT NULL,
+    version INT NOT NULL,
+    PRIMARY KEY (bmid, sid),
+    FOREIGN KEY (bmid) REFERENCES BaseModel(bmid) ON DELETE CASCADE,
+    FOREIGN KEY (sid) REFERENCES InternetService(sid) ON DELETE CASCADE
+);
+
+CREATE TABLE BaseModel (
+    bmid INT,
+    creator_uid INT NOT NULL,
+    description TEXT NOT NULL,
+    PRIMARY KEY (bmid),
+    FOREIGN KEY (creator_uid) REFERENCES AgentCreator(uid) ON DELETE CASCADE
+);
+
+Translate this natural language query into MySQL format: Find all the Internet Service(sid) that are utilized by every Base Model built by the agent creator user_iuwrh.",2,"SELECT ms.sid
+FROM ModelServices ms
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM BaseModel bm
+    JOIN AgentCreator ac ON bm.creator_uid = ac.uid
+    JOIN User u ON u.uid = ac.uid
+    WHERE u.username = 'user_iuwrh'
+      AND NOT EXISTS (
+          SELECT 1
+          FROM ModelServices ms2
+          WHERE ms2.bmid = bm.bmid
+            AND ms2.sid = ms.sid
+      )
+);
+",FALSE,FALSE,FALSE
+2,Find all the Internet Service(sid) that are utilized by every Base Model built by the agent creator user_iuwrh.,ChatGPT 5.1,"CREATE TABLE User (
+    uid INT,
+    email TEXT NOT NULL,
+    username TEXT NOT NULL,
+    PRIMARY KEY (uid)
+);
+
+CREATE TABLE AgentCreator (
+    uid INT,
+    bio TEXT,
+    payout TEXT,
+    PRIMARY KEY (uid),
+    FOREIGN KEY (uid) REFERENCES User(uid) ON DELETE CASCADE
+);
+
+CREATE TABLE ModelServices (
+    bmid INT NOT NULL,
+    sid INT NOT NULL,
+    version INT NOT NULL,
+    PRIMARY KEY (bmid, sid),
+    FOREIGN KEY (bmid) REFERENCES BaseModel(bmid) ON DELETE CASCADE,
+    FOREIGN KEY (sid) REFERENCES InternetService(sid) ON DELETE CASCADE
+);
+
+CREATE TABLE BaseModel (
+    bmid INT,
+    creator_uid INT NOT NULL,
+    description TEXT NOT NULL,
+    PRIMARY KEY (bmid),
+    FOREIGN KEY (creator_uid) REFERENCES AgentCreator(uid) ON DELETE CASCADE
+);
+
+Translate this natural language query into MySQL format: Find all the Internet Service(sid) that are utilized by any Base Model built by the agent creator user_iuwrh.",3,"SELECT DISTINCT ms.sid
+FROM User u
+JOIN AgentCreator ac ON ac.uid = u.uid
+JOIN BaseModel bm ON bm.creator_uid = ac.uid
+JOIN ModelServices ms ON ms.bmid = bm.bmid
+WHERE u.username = 'user_iuwrh';
+",TRUE,FALSE,FALSE
+3,Find all customized models(mid) that do not appear in model configurations.,ChatGPT 5.1,Translate this natural language query into SQL format: Find all customized models(mid) that do not appear in model configurations.,1,"SELECT mid
+FROM customized_models
+WHERE mid NOT IN (
+    SELECT mid
+    FROM model_configurations
+);
+",FALSE,FALSE,TRUE
+3,Find all customized models(mid) that do not appear in model configurations.,ChatGPT 5.1,"CREATE TABLE ModelConfigurations (
+    bmid INT NOT NULL,
+    mid INT NOT NULL,
+    cid INT NOT NULL,
+    duration INT NOT NULL,
+    PRIMARY KEY (bmid, mid, cid),
+    FOREIGN KEY (bmid, mid) REFERENCES CustomizedModel(bmid, mid) ON DELETE CASCADE,
+    FOREIGN KEY (cid) REFERENCES Configuration(cid) ON DELETE CASCADE
+);
+
+Translate this natural language query into MySQL format: Find all customized models(mid) that do not appear in model configurations.",2,"SELECT cm.mid
+FROM CustomizedModel AS cm
+WHERE NOT EXISTS (
+    SELECT 1
+    FROM ModelConfigurations AS mc
+    WHERE mc.bmid = cm.bmid
+      AND mc.mid = cm.mid
+);
+",TRUE,FALSE,FALSE
+3,Find all customized models(mid) that do not appear in model configurations.,ChatGPT 5.1,"CREATE TABLE CustomizedModel (
+    bmid INT,
+    mid INT NOT NULL,
+    PRIMARY KEY (bmid, mid),
+    FOREIGN KEY (bmid) REFERENCES BaseModel(bmid) ON DELETE CASCADE
+);
+
+CREATE TABLE ModelConfigurations (
+    bmid INT NOT NULL,
+    mid INT NOT NULL,
+    cid INT NOT NULL,
+    duration INT NOT NULL,
+    PRIMARY KEY (bmid, mid, cid),
+    FOREIGN KEY (bmid, mid) REFERENCES CustomizedModel(bmid, mid) ON DELETE CASCADE,
+    FOREIGN KEY (cid) REFERENCES Configuration(cid) ON DELETE CASCADE
+);
+
+CREATE TABLE BaseModel (
+    bmid INT,
+    creator_uid INT NOT NULL,
+    description TEXT NOT NULL,
+    PRIMARY KEY (bmid),
+    FOREIGN KEY (creator_uid) REFERENCES AgentCreator(uid) ON DELETE CASCADE
+);
+
+Translate this natural language query into MySQL format: Find all customized models(mid) that do not appear in model configurations.",3,"SELECT cm.mid
+FROM CustomizedModel AS cm
+LEFT JOIN ModelConfigurations AS mc
+    ON cm.bmid = mc.bmid
+   AND cm.mid = mc.mid
+WHERE mc.mid IS NULL;
+",TRUE,FALSE,FALSE
