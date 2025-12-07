@@ -1,5 +1,3 @@
-
-
 def get_query(file_path: str):
     with open(f"sql/{file_path}.sql", 'r') as f:
         sql_script = f.read()

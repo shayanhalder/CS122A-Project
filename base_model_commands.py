@@ -1,4 +1,5 @@
 import mysql.connector
+
 def listInternetService(cursor, id):
     cursor.execute(f'''SELECT s.sid, s.endpoints, s.provider
                    FROM InternetService AS s JOIN ModelServices AS ms ON s.sid = ms.sid
