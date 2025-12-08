@@ -45,6 +45,4 @@ def topNDurationConfig(cursor, uid, N):
         
         return response
     except Exception as e:
-        print("topNDurationConfig error: ")
-        print(e)
         return "Fail"

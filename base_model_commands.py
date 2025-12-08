@@ -56,3 +56,26 @@ def deleteBaseModel(cursor, mydb, bmid):
         return "Success"
     except mysql.connector.Error as err:
         return "Fail"
+
+def listBaseModelKeyWord(cursor, keyword):
+    try:
+        # strip in case passed in with quotation marks
+        keyword = keyword.strip('"\'')
+        query = f'''SELECT DISTINCT b.bmid
+                FROM BaseModel AS b
+                JOIN ModelServices AS ms ON b.bmid = ms.bmid
+                JOIN LLMService AS llm ON ms.sid = llm.sid
+                WHERE llm.domain LIKE '%{keyword}%'
+                ORDER BY b.bmid ASC
+                LIMIT 5'''
+        
+        cursor.execute(query)
+        response = cursor.fetchall()
+        
+        for i in range(len(response)):
+            res = response[i]
+            response[i] = f'{res[0]}'
+        
+        return response
+    except Exception as e:
+        return "Fail"

@@ -2,7 +2,7 @@ import mysql.connector
 import sys
 from json import dumps
 from table_initialization import import_dataset
-from base_model_commands import listInternetService, countCustomizedModel, addCustomizedModel, deleteBaseModel
+from base_model_commands import listInternetService, countCustomizedModel, addCustomizedModel, deleteBaseModel, listBaseModelKeyWord
 from nl2sql_commands import readNL2SQLresult
 from agent_client_commands import insertAgentClient, topNDurationConfig
 
@@ -34,6 +34,11 @@ def main():
 	elif command == 'listInternetService':
 		id = sys.argv[2]
 		response = listInternetService(mycursor, id)
+		for res in response:
+			print(res)
+	elif command == 'listBaseModelKeyWord':
+		keyword = sys.argv[2]
+		response = listBaseModelKeyWord(mycursor, keyword)
 		for res in response:
 			print(res)
 	elif command == 'countCustomizedModel':
