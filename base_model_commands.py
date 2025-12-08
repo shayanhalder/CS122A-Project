@@ -61,10 +61,11 @@ def listBaseModelKeyWord(cursor, keyword):
     try:
         # strip in case passed in with quotation marks
         keyword = keyword.strip('"\'')
-        query = f'''SELECT DISTINCT b.bmid
+        query = f'''SELECT DISTINCT b.bmid, llm.sid, isv.provider, llm.domain
                 FROM BaseModel AS b
                 JOIN ModelServices AS ms ON b.bmid = ms.bmid
                 JOIN LLMService AS llm ON ms.sid = llm.sid
+                JOIN InternetService AS isv ON llm.sid = isv.sid
                 WHERE llm.domain LIKE '%{keyword}%'
                 ORDER BY b.bmid ASC
                 LIMIT 5'''
@@ -74,7 +75,7 @@ def listBaseModelKeyWord(cursor, keyword):
         
         for i in range(len(response)):
             res = response[i]
-            response[i] = f'{res[0]}'
+            response[i] = f'{res[0]},{res[1]},{res[2]},{res[3]}'
         
         return response
     except Exception as e:
