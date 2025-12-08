@@ -36,7 +36,7 @@ def countCustomizedModel(cursor, ids):
 
 def addCustomizedModel(cursor, mydb, mid, bmid): 
     try: 
-        query = f'''INSERT INTO CustomizedModel (bmid, mid)
+        query = f'''INSERT INTO CustomizedModel (mid, bmid)
                     VALUES ( {mid}, {bmid})'''
         cursor.execute(query)
         mydb.commit()
