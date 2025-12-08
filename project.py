@@ -11,18 +11,15 @@ load_dotenv()
 config = dotenv_values(".env")
 
 def main():
-	print(sys.argv)
-    
 	mydb = mysql.connector.connect(
 		host="localhost",
 		user="root",
 		password=config["PASSWORD"],
-  		database="AgentPlatform"
 	)
- 
-	print("Connection successful\n")
-
+	
 	mycursor = mydb.cursor()
+	mycursor.execute("USE AgentPlatform;")
+  
 	command = sys.argv[1]
  
 	if command == 'import':
