@@ -1,5 +1,5 @@
 def get_query(file_path: str) -> str:
-    with open(f"sql/{file_path}.sql", 'r') as f:
+    with open(f"{file_path}.sql", 'r') as f:
         sql_script = f.read()
     return sql_script
 
@@ -11,16 +11,18 @@ def create_tables(cursor, mydb) -> str:
                             'Configuration', 'InternetService', 'LLMService', 'DataStorage', 'ModelServices', 
                             'ModelConfigurations'] 
 
-        cursor.execute("DROP DATABASE IF EXISTS AgentPlatform;")
-        cursor.execute("CREATE DATABASE AgentPlatform;")
-        cursor.execute("USE AgentPlatform;")
+        # cursor.execute("DROP DATABASE IF EXISTS AgentPlatform;")
+        # cursor.execute("CREATE DATABASE AgentPlatform;")
+        # cursor.execute("USE AgentPlatform;")
 
         for file_path in sql_file_paths:
             sql = get_query(file_path)
             cursor.execute(sql)
             mydb.commit()
         return "Success"
-    except Exception: 
+    except Exception as e: 
+        # print("create_tables error: ")
+        # print(e)
         return "Fail"
         
 def load_csv_data_file(csv_file_path: str, cursor, mydb) -> str:
@@ -41,10 +43,13 @@ def load_csv_data_file(csv_file_path: str, cursor, mydb) -> str:
             INSERT INTO {csv_file_path.split('/')[1].split('.')[0]} ({(lines[0])})
             VALUES ({formatted_values});
             """
+            # print(load_data_query)
             cursor.execute(load_data_query)
             mydb.commit()
         return "Success"
-    except Exception: 
+    except Exception as e: 
+        # print("load_csv_data_file error: ")
+        # print(e)
         return "Fail"
     
 def load_csv_data(cursor, mydb, csv_dir: str) -> str:

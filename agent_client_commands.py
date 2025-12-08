@@ -21,5 +21,7 @@ def insertAgentClient(values, cursor, mydb) -> str:
         cursor.execute(query)
         mydb.commit()
         return "Success"
-    except Exception:
+    except Exception as e:
+        # print("insertAgentClient error: ")
+        # print(e)
         return "Fail"

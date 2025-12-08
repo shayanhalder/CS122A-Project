@@ -1,24 +1,20 @@
 import mysql.connector
 import sys
 from json import dumps
-from dotenv import dotenv_values, load_dotenv
 from table_initialization import import_dataset
 from base_model_commands import listInternetService, countCustomizedModel, addCustomizedModel, deleteBaseModel
 from nl2sql_commands import readNL2SQLresult
 from agent_client_commands import insertAgentClient
 
-load_dotenv()
-config = dotenv_values(".env")
-
 def main():
 	mydb = mysql.connector.connect(
 		host="localhost",
-		user="root",
-		password=config["PASSWORD"],
+		user="test",
+		password="password",
 	)
 	
 	mycursor = mydb.cursor()
-	mycursor.execute("USE AgentPlatform;")
+	mycursor.execute("USE cs122a;")
   
 	command = sys.argv[1]
  
