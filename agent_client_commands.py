@@ -25,3 +25,26 @@ def insertAgentClient(values, cursor, mydb) -> str:
         # print("insertAgentClient error: ")
         # print(e)
         return "Fail"
+
+def topNDurationConfig(cursor, uid, N):
+    try:
+        query = f'''SELECT c.client_uid, c.cid, c.labels, c.content, MAX(mc.duration) as duration
+                    FROM Configuration AS c
+                    JOIN ModelConfigurations AS mc ON c.cid = mc.cid
+                    WHERE c.client_uid = {uid}
+                    GROUP BY c.cid, c.client_uid, c.labels, c.content
+                    ORDER BY duration DESC
+                    LIMIT {N}'''
+        
+        cursor.execute(query)
+        response = cursor.fetchall()
+        
+        for i in range(len(response)):
+            res = response[i]
+            response[i] = f'{res[0]},{res[1]},{res[2]},{res[3]},{res[4]}'
+        
+        return response
+    except Exception as e:
+        print("topNDurationConfig error: ")
+        print(e)
+        return "Fail"
