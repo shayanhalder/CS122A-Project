@@ -50,6 +50,9 @@ def deleteBaseModel(cursor, mydb, bmid):
                     WHERE bmid={bmid}'''
         cursor.execute(query)
         mydb.commit()
+        if cursor.rowcount == 0:
+            return "Fail"
+        mydb.commit()
         return "Success"
     except mysql.connector.Error as err:
         return "Fail"
